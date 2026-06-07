@@ -1,9 +1,12 @@
-# ↓↓↓ 【ここを最優先で追加】matplotlibのエラーを完全に黙らせる魔法の2行 ↓↓↓
-import os
-os.environ['MPLBACKEND'] = 'Agg' 
+# ↓↓↓ 【ここを最優先で追加】PyTorchのセキュリティブロックを解除する魔法の3行 ↓↓↓
+import torch
+import TTS.tts.configs.xtts_config
+torch.serialization.add_safe_globals([TTS.tts.configs.xtts_config.XttsConfig])
 # ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑
 
-import torch
+import os
+os.environ['MPLBACKEND'] = 'Agg' 
+
 from google import genai
 from google.genai import types
 from TTS.api import TTS
