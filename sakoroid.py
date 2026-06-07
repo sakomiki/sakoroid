@@ -1,16 +1,24 @@
-# 1. 【最優先】何が何でも一番最初に画面描画のバグを封じ込める
+# 1. 【最優先】画面描画のバグを封じ込める
 import os
 os.environ['MPLBACKEND'] = 'Agg' 
 
-# 2. 【2番目】その次にPyTorchのセキュリティブロックを解除する
+# 2. 【最重要】PyTorchのセキュリティ検問（すべてのドア）を事前に一括解除する
 import torch
 try:
     import TTS.tts.configs.xtts_config
-    torch.serialization.add_safe_globals([TTS.tts.configs.xtts_config.XttsConfig])
+    import TTS.tts.models.xtts
+    import TTS.config.shared_configs
+    
+    torch.serialization.add_safe_globals([
+        TTS.tts.configs.xtts_config.XttsConfig,
+        TTS.tts.models.xtts.XttsAudioConfig,
+        TTS.tts.models.xtts.XttsArgs,
+        TTS.config.shared_configs.BaseAudioConfig
+    ])
 except Exception:
-    pass # まだインポートできない場合はスルーして後乗せする
+    pass
 
-# 3. 【3番目】その他のライブラリを読み込む
+# 3. その他のライブラリを読み込む
 from google import genai
 from google.genai import types
 from TTS.api import TTS
