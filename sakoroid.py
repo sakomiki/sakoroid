@@ -46,7 +46,7 @@ def main():
     print("📣 音声データを生成中...")
     tts.tts_to_file(
         text=ai_text,
-        speaker_name="Anais Betts", 
+        speaker="Anais Betts",  # ← 【ここを speaker_name から speaker に変更！】
         language="ja",              
         file_path="output.wav"      
     )
