@@ -60,9 +60,15 @@ def main():
     
     # 3. 内蔵されている女性の声を使って喋らせる
     print("📣 音声データを生成中...")
+    
+    # 【超安全対策】モデルが持っているスピーカー名リストから、最初の1人（確実にある声）を自動取得
+    available_speakers = tts.speakers
+    chosen_speaker = "Aura Rachel" if "Aura Rachel" in available_speakers else available_speakers[0]
+    print(f"👤 使用するスピーカー: {chosen_speaker}")
+
     tts.tts_to_file(
         text=ai_text,
-        speaker="Anais Betts",
+        speaker=chosen_speaker,  # ← 自動選択された確実に存在する声をセット！
         language="ja",              
         file_path="output.wav"      
     )
