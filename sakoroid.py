@@ -2,7 +2,7 @@
 import os
 os.environ['MPLBACKEND'] = 'Agg' 
 
-# 2. 【最重要】PyTorchのセキュリティ検問（すべてのドア）を事前に一括解除する
+# 2. 【最重要】PyTorchのセキュリティ検問（すべてのConfigを一網打尽にする）
 import torch
 try:
     import TTS.tts.configs.xtts_config
@@ -13,7 +13,8 @@ try:
         TTS.tts.configs.xtts_config.XttsConfig,
         TTS.tts.models.xtts.XttsAudioConfig,
         TTS.tts.models.xtts.XttsArgs,
-        TTS.config.shared_configs.BaseAudioConfig
+        TTS.config.shared_configs.BaseAudioConfig,
+        TTS.config.shared_configs.BaseDatasetConfig  # ←【これを追加！】
     ])
 except Exception:
     pass
@@ -37,7 +38,7 @@ def main():
     print(f"🤖 Geminiの思考セリフ: {ai_text}")
     
     # 2. Coqui TTS（XTTS v2）の超リアルAIを起動
-    print("⏳ AI音声モデルを読み込み中（初回はダウンロードに1分ほどかかります）...")
+    print("⏳ AI音声モデルを読み込み中...")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
     
