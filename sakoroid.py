@@ -2,7 +2,7 @@
 import os
 os.environ['MPLBACKEND'] = 'Agg' 
 
-# 2. 【最重要】PyTorchのセキュリティ検問（すべてのConfigを一網打尽にする）
+# 2. 【最重要】PyTorchのセキュリティ検問を一括解除する
 import torch
 try:
     import TTS.tts.configs.xtts_config
@@ -14,27 +14,43 @@ try:
         TTS.tts.models.xtts.XttsAudioConfig,
         TTS.tts.models.xtts.XttsArgs,
         TTS.config.shared_configs.BaseAudioConfig,
-        TTS.config.shared_configs.BaseDatasetConfig  # ←【これを追加！】
+        TTS.config.shared_configs.BaseDatasetConfig
     ])
 except Exception:
     pass
 
 # 3. その他のライブラリを読み込む
+import time
 from google import genai
 from google.genai import types
+from google.genai.errors import ServerError
 from TTS.api import TTS
 
 def main():
     print("🤖 sakoroid システム（XTTS v2）起動中...")
     
-    # 1. Geminiにセリフを考えてもらう
+    # 1. Geminiにセリフを考えてもらう（リトライ機能付き）
     client = genai.Client()
     prompt = "「sakoroidの起動に成功しました」というセリフを、1文で短く、人間の女の子っぽく可愛いらしく言ってください。セリフの文字だけを出力してください。"
-    response = client.models.generate_content(
-        model='gemini-2.5-flash-8b', 
-        contents=prompt
-    )
-    ai_text = response.text.strip()
+    
+    ai_text = "sakoroid、起動できたよ！" # 万が一のときのバックアップセリフ
+    
+    for attempt in range(3):
+        try:
+            print(f"⏳ Geminiが思考中... (試行 {attempt + 1}/3)")
+            response = client.models.generate_content(
+                model='gemini-2.5-flash', # 公式100%サポートの本命モデル
+                contents=prompt
+            )
+            ai_text = response.text.strip()
+            break
+        except ServerError as e:
+            if "503" in str(e) and attempt < 2:
+                print("⚠️ Googleのサーバーが混雑しています。3秒後に自動で再接続します...")
+                time.sleep(3)
+                continue
+            raise e
+
     print(f"🤖 Geminiの思考セリフ: {ai_text}")
     
     # 2. Coqui TTS（XTTS v2）の超リアルAIを起動
@@ -46,7 +62,7 @@ def main():
     print("📣 音声データを生成中...")
     tts.tts_to_file(
         text=ai_text,
-        speaker="Anais Betts",  # ← 【ここを speaker_name から speaker に変更！】
+        speaker="Anais Betts",
         language="ja",              
         file_path="output.wav"      
     )
