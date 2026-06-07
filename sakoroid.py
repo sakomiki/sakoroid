@@ -1,6 +1,11 @@
+# ↓↓↓ 【ここを最優先で追加】matplotlibのエラーを完全に黙らせる魔法の2行 ↓↓↓
 import os
+os.environ['MPLBACKEND'] = 'Agg' 
+# ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑
+
 import torch
 from google import genai
+from google.genai import types
 from TTS.api import TTS
 
 def main():
@@ -8,7 +13,7 @@ def main():
     
     # 1. Geminiにセリフを考えてもらう
     client = genai.Client()
-    prompt = "「sakoroidの起動に成功しました」というセリフを、1文で短く、人間の女の子っぽく可愛いらしく言ってください。セリフの文字だけを出力してください（解説や挨拶は不要です）。"
+    prompt = "「sakoroidの起動に成功しました」というセリフを、1文で短く、人間の女の子っぽく可愛いらしく言ってください。セリフの文字だけを出力してください。"
     response = client.models.generate_content(
         model='gemini-2.5-flash', 
         contents=prompt
@@ -21,16 +26,13 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
     
-    # 3. あなたの声（またはサンプルの声）を元に、人間らしい抑揚で喋らせる！
-    print("📣 自分の声（クローン）で音声データを生成中...")
-    
-    # ※もし自分の声の「my_voice.wav」があればそれを指定します。
-    # 最初はテストとして、AIモデルに内蔵されているデフォルトの女性の声（スピーカー）を借りて喋らせます。
+    # 3. 内蔵されている女性の声を使って喋らせる
+    print("📣 音声データを生成中...")
     tts.tts_to_file(
         text=ai_text,
-        speaker_wav="my_voice.wav", # 内蔵されている人間らしい声の持ち主
-        language="ja",              # 日本語を指定
-        file_path="output.wav"      # 完成した音声の保存先
+        speaker_name="Anais Betts", 
+        language="ja",              
+        file_path="output.wav"      
     )
     print("🎉 本物の人間そっくりの output.wav が作成されました！")
 
