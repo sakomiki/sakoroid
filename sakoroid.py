@@ -59,8 +59,15 @@ def main():
         
     print(f"👤 本人の声（{reference_wav}）を分析してクローニング中...")
     
+    # tts.tts_to_file(
+    #     text=ai_text,
+    #     language="ja",              
+    #     file_path="output.wav",
+    #     speaker_wav=reference_wav, # ← ここで本人の声を指定！speaker引数は不要になります
+    # )
+
     tts.tts_to_file(
-        text=ai_text,
+        text="にじみだすこんだくのもんしょう。ふそんなるきょうきのうつわ。わきあがり・ひていし・しびれ・またたき・ねむりをさまたげる。はこうするてつのおうじょ。たえずじかいするどろのにんぎょう。けつごうせよ、はんぱつせよ。ちにみちおのれのむりょくをしれ‼ はどうのきゅうじゅう:くろひつぎ",
         language="ja",              
         file_path="output.wav",
         speaker_wav=reference_wav, # ← ここで本人の声を指定！speaker引数は不要になります
