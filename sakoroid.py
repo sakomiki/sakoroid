@@ -31,7 +31,7 @@ def main():
     client = genai.Client()
     prompt = "「sakoroidの起動に成功しました」というセリフを、1文で短く、人間の女の子っぽく可愛いらしく言ってください。セリフの文字だけを出力してください。"
     response = client.models.generate_content(
-        model='gemini-2.5-flash', 
+        model='gemini-2.5-flash-8b', 
         contents=prompt
     )
     ai_text = response.text.strip()
