@@ -1,12 +1,16 @@
-# ↓↓↓ 【ここを最優先で追加】PyTorchのセキュリティブロックを解除する魔法の3行 ↓↓↓
-import torch
-import TTS.tts.configs.xtts_config
-torch.serialization.add_safe_globals([TTS.tts.configs.xtts_config.XttsConfig])
-# ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑ ↑↑↑
-
+# 1. 【最優先】何が何でも一番最初に画面描画のバグを封じ込める
 import os
 os.environ['MPLBACKEND'] = 'Agg' 
 
+# 2. 【2番目】その次にPyTorchのセキュリティブロックを解除する
+import torch
+try:
+    import TTS.tts.configs.xtts_config
+    torch.serialization.add_safe_globals([TTS.tts.configs.xtts_config.XttsConfig])
+except Exception:
+    pass # まだインポートできない場合はスルーして後乗せする
+
+# 3. 【3番目】その他のライブラリを読み込む
 from google import genai
 from google.genai import types
 from TTS.api import TTS
