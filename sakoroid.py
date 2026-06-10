@@ -17,74 +17,39 @@ try:
 except Exception:
     pass
 
-import time
-from google import genai
-from google.genai import types
-from google.genai.errors import ServerError
 from TTS.api import TTS
 
 def main():
-    print("🤖 sakoroid システム（XTTS v2 ボイスクローニング）起動中...")
+    print("🤖 sakoroid システム（黒棺・スタンドアロン詠唱モード）起動中...")
     
-    # 1. Geminiにセリフを考えてもらう
-    client = genai.Client()
-    prompt = "「sakoroidの起動に成功しました」というセリフを、1文で短く、人間の女の子っぽく可愛いらしく言ってください。セリフの文字だけを出力してください。"
+    # 【変更点】Geminiは完全廃止！喋らせたいセリフをここに直接固定
+    ai_text = "にじみだすこんだくのもんしょう。ふそんなるきょうきのうつわ。わきあがり・ひていし・しびれ・またたき・ねむりをさまたげる。はこうするてつのおうじょ。たえずじかいするどろのにんぎょう。けつごうせよ、はんぱつせよ。ちにみちおのれのむりょくをしれ‼ はどうのきゅうじゅう:くろひつぎ"
     
-    ai_text = "sakoroid、起動できたよ！"
-    for attempt in range(3):
-        try:
-            response = client.models.generate_content(
-                model='gemini-2.5-flash',
-                contents=prompt
-            )
-            ai_text = response.text.strip()
-            break
-        except ServerError:
-            time.sleep(3)
-
-    print(f"🤖 Geminiの思考セリフ: {ai_text}")
+    print(f"📖 詠唱テキスト: {ai_text}")
     
-    # 2. Coqui TTS（XTTS v2）を起動
+    # 1. Coqui TTS（XTTS v2）を起動
     print("⏳ AI音声モデルを読み込み中...")
     device = "cuda" if torch.cuda.is_available() else "cpu"
     tts = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
     
-    # 3. 本人の声（target.wav）を分析して、その声で喋らせる！
-    # ※プログラムと同じ場所に target.wav を置いておく必要があります
-    reference_wav = "/content/sakoroid/sakoroid/target.wav" 
-    
+    # 2. 本人の声（target.wav）を分析してクローニング
+    reference_wav = "/content/sakoroid/target.wav" 
     if not os.path.exists(reference_wav):
-        # フォルダがずれていた場合のバックアップ確認
         reference_wav = "target.wav"
         
     print(f"👤 本人の声（{reference_wav}）を分析してクローニング中...")
     
-    # tts.tts_to_file(
-    #     text=ai_text,
-    #     language="ja",              
-    #     file_path="output.wav",
-    #     speaker_wav=reference_wav, # ← ここで本人の声を指定！speaker引数は不要になります
-    # )
-
-    # tts.tts_to_file(
-    #     text="にじみだすこんだくのもんしょう。ふそんなるきょうきのうつわ。わきあがり・ひていし・しびれ・またたき・ねむりをさまたげる。はこうするてつのおうじょ。たえずじかいするどろのにんぎょう。けつごうせよ、はんぱつせよ。ちにみちおのれのむりょくをしれ‼ はどうのきゅうじゅう:くろひつぎ",
-    #     language="ja",              
-    #     file_path="output.wav",
-    #     speaker_wav=reference_wav, # ← ここで本人の声を指定！speaker引数は不要になります
-    # )
-
     tts.tts_to_file(
-        text="にじみだすこんだくのもんしょう。ふそんなるきょうきのうつわ。わきあがり・ひていし・しびれ・またたき・ねむりをさまたげる。はこうするてつのおうじょ。たえずじかいするどろのにんぎょう。けつごうせよ、はんぱつせよ。ちにみちおのれのむりょくをしれ‼ はどうのきゅうじゅう:くろひつぎ",
+        text=ai_text,
         language="ja",              
         file_path="output.wav",
         speaker_wav=reference_wav,
         
-        # ↓↓↓ ここから調整用の隠しツマミ ↓↓↓
-        temperature=0.75,   # 話し方の「感情の豊かさ・ランダム性」（0.1〜1.0）
-        speed=1.0,          # 話す速度。0.9で少しおっとり、1.1でハキハキ早口に
-        # ↑↑↑ 調整用の隠しツマミ ↑↑↑
+        # ↓↓↓ パラメーター調整ツマミ（お好みで数値を調整してください！） ↓↓↓
+        temperature=0.75,   # 話し方の感情・ランダム性（0.1〜1.0）
+        speed=1.0,          # 話す速度
     )
-    print("🎉 本人の声を完全に再現した output.wav が作成されました！")
+    print("🎉 本人の声での『黒棺』完全詠唱 output.wav が作成されました！")
 
 if __name__ == "__main__":
     main()
